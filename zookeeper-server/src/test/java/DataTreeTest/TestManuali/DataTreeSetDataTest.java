@@ -99,29 +99,7 @@ public class DataTreeSetDataTest {
                         Arrays.asList("/a")
                 ),
 
-                // T3 - path valido semplice, nodo da modificare presente, aggiornamento eseguito e Stat restituito
-                Arguments.of(
-                        Arrays.asList("/a"),
-                        "/a",
-                        NEW_DATA,
-                        0,
-                        1L,
-                        200L,
-                        Collections.emptyList()
-                ),
-
-                // T4 - path valido multilivello, nodo figlio presente, dati aggiornati sul nodo figlio
-                Arguments.of(
-                        Arrays.asList("/a", "/a/b"),
-                        "/a/b",
-                        "new-child-data".getBytes(),
-                        0,
-                        1L,
-                        200L,
-                        Arrays.asList("/a")
-                ),
-
-                // T11 - path valido semplice, nodo presente, data = new byte[0]
+                // T9 - path valido semplice, nodo presente, data = new byte[0]
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -132,7 +110,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T12 - path valido semplice, nodo presente, data = null
+                // T10 - path valido semplice, nodo presente, data = null
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -143,7 +121,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T13 - path valido semplice, nodo presente, data di dimensione elevata
+                // T11 - path valido semplice, nodo presente, data di dimensione elevata
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -154,18 +132,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T14 - path valido semplice, nodo presente, version = 0
-                Arguments.of(
-                        Arrays.asList("/a"),
-                        "/a",
-                        NEW_DATA,
-                        0,
-                        1L,
-                        200L,
-                        Collections.emptyList()
-                ),
-
-                // T15 - path valido semplice, nodo presente, version = 1
+                // T12 - path valido semplice, nodo presente, version = 1
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -176,7 +143,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T16 - path valido semplice, nodo presente, version = -1
+                // T13 - path valido semplice, nodo presente, version = -1
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -187,18 +154,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T17 - path valido semplice, nodo presente, zxid = 1L
-                Arguments.of(
-                        Arrays.asList("/a"),
-                        "/a",
-                        NEW_DATA,
-                        0,
-                        1L,
-                        200L,
-                        Collections.emptyList()
-                ),
-
-                // T18 - path valido semplice, nodo presente, zxid = 0L
+                // T14 - path valido semplice, nodo presente, zxid = 0L
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -209,7 +165,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T19 - path valido semplice, nodo presente, zxid = -1L
+                // T15 - path valido semplice, nodo presente, zxid = -1L
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -220,7 +176,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T20 - path valido semplice, nodo presente, time = System.currentTimeMillis()
+                // T16 - path valido semplice, nodo presente, time = System.currentTimeMillis()
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -231,7 +187,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T21 - path valido semplice, nodo presente, time = 0L
+                // T17 - path valido semplice, nodo presente, time = 0L
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -242,7 +198,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T22 - path valido semplice, nodo presente, time = -1L
+                // T18 - path valido semplice, nodo presente, time = -1L
                 Arguments.of(
                         Arrays.asList("/a"),
                         "/a",
@@ -253,7 +209,7 @@ public class DataTreeSetDataTest {
                         Collections.emptyList()
                 ),
 
-                // T24 - path valido multilivello, DataTree con più rami indipendenti, modifica solo del ramo target
+                // T20 - path valido multilivello, DataTree con più rami indipendenti, modifica solo del ramo target
                 Arguments.of(
                         Arrays.asList("/a", "/x", "/x/y"),
                         "/x/y",
@@ -268,7 +224,7 @@ public class DataTreeSetDataTest {
 
     @ParameterizedTest(name = "{index}: setData({1})")
     @MethodSource("validSetDataParameters")
-    public void setDataShouldUpdateExpectedNodeDataAndStat(
+    public void setDataUpdatesNodeAndStat(
             List<String> initialPaths,
             String pathToUpdate,
             byte[] newData,
@@ -306,8 +262,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataShouldThrowNoNodeExceptionWhenMultilevelNodeDoesNotExist() {
-        // T5 - path valido multilivello, nodo da modificare assente, attesa NoNodeException
+    public void setDataMissingMultilevelThrows() {
+        // T3 - path valido multilivello, nodo da modificare assente, attesa NoNodeException
 
         assertThrows(
                 KeeperException.NoNodeException.class,
@@ -324,8 +280,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataOnRootShouldUpdateRootOrNotCorruptTree() throws Exception {
-        // T6 - path radice, DataTree nello stato iniziale, aggiornamento root oppure gestione corretta del caso limite
+    public void setDataOnRoot() throws Exception {
+        // T4 - path radice, DataTree nello stato iniziale, aggiornamento root oppure gestione corretta del caso limite
 
         try {
             Stat returnedStat = dataTree.setData(
@@ -345,8 +301,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataWithNullPathShouldThrowExceptionOrNotCorruptTree() throws Exception {
-        // T7 - path nullo, DataTree nello stato iniziale, eccezione oppure stato non corrotto
+    public void setDataNullPath() throws Exception {
+        // T5 - path nullo, DataTree nello stato iniziale, eccezione oppure stato non corrotto
 
         assertThrows(
                 Exception.class,
@@ -363,8 +319,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataWithEmptyPathShouldThrowExceptionOrNotCorruptTree() throws Exception {
-        // T8 - path vuoto, DataTree nello stato iniziale, eccezione oppure stato non corrotto
+    public void setDataEmptyPath() throws Exception {
+        // T6 - path vuoto, DataTree nello stato iniziale, eccezione oppure stato non corrotto
 
         try {
             dataTree.setData(
@@ -383,17 +339,17 @@ public class DataTreeSetDataTest {
 
     static Stream<Arguments> malformedPathParameters() {
         return Stream.of(
-                // T9 - path malformato senza slash iniziale
+                // T7 - path malformato senza slash iniziale
                 Arguments.of("a/b"),
 
-                // T10 - path malformato con doppio slash
+                // T8 - path malformato con doppio slash
                 Arguments.of("/a//b")
         );
     }
 
     @ParameterizedTest(name = "{index}: malformed path = {0}")
     @MethodSource("malformedPathParameters")
-    public void setDataWithMalformedPathShouldThrowNoNodeException(String malformedPath) {
+    public void setDataMalformedPath(String malformedPath) {
         assertThrows(
                 KeeperException.NoNodeException.class,
                 () -> dataTree.setData(
@@ -409,8 +365,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataShouldStoreEmptyDataCorrectly() throws Exception {
-        // Verifica specifica del caso T11 - data = new byte[0]
+    public void setDataEmptyData() throws Exception {
+        // Verifica specifica del caso T9 - data = new byte[0]
 
         createValidNode("/a");
 
@@ -429,8 +385,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataShouldStoreNullDataCorrectly() throws Exception {
-        // Verifica specifica del caso T12 - data = null
+    public void setDataNullData() throws Exception {
+        // Verifica specifica del caso T10 - data = null
 
         createValidNode("/a");
 
@@ -448,8 +404,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataShouldStoreLargeDataCorrectly() throws Exception {
-        // Verifica specifica del caso T13 - data di dimensione elevata
+    public void setDataLargeData() throws Exception {
+        // Verifica specifica del caso T11 - data di dimensione elevata
 
         byte[] largeData = new byte[1024 * 1024];
         Arrays.fill(largeData, (byte) 7);
@@ -468,8 +424,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataShouldThrowNoNodeExceptionWhenSimpleNodeDoesNotExist() {
-        // T23 - path valido semplice, nodo da modificare assente, attesa NoNodeException
+    public void setDataMissingSimpleThrows() {
+        // T19 - path valido semplice, nodo da modificare assente, attesa NoNodeException
 
         assertThrows(
                 KeeperException.NoNodeException.class,
@@ -486,8 +442,8 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void setDataOnIndependentBranchShouldNotAlterExistingBranch() throws Exception {
-        // Verifica specifica del caso T24 - modifica di /x/y senza alterare il ramo indipendente /a
+    public void setDataIndependentBranch() throws Exception {
+        // Verifica specifica del caso T20 - modifica di /x/y senza alterare il ramo indipendente /a
 
         createValidNode("/a");
         createValidNode("/x");
@@ -511,7 +467,7 @@ public class DataTreeSetDataTest {
     }
 
     @Test
-    public void getDataWithEmptyPathShouldNotCorruptTree() {
+    public void getDataEmptyPathNotCorrupt() {
         try {
             dataTree.getData("", new Stat(), null);
         } catch (Exception ignored) {

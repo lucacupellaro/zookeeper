@@ -191,7 +191,7 @@ public class DataTreeGetChildrenTest {
 
     @ParameterizedTest(name = "{index}: getChildren({1})")
     @MethodSource("childrenEqualityParameters")
-    public void getChildrenShouldReturnExpectedChildren(
+    public void getChildrenExpected(
             List<String> initialPaths,
             String pathToQuery,
             StatCase statCase,
@@ -216,7 +216,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenOnRootInInitialTreeShouldReturnNonNullList() throws Exception {
+    public void getChildrenRootInitialTree() throws Exception {
         // T3 - path radice, DataTree nello stato iniziale, stat valido
 
         List<String> children = dataTree.getChildren(
@@ -229,7 +229,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenWithNullPathShouldThrowException() {
+    public void getChildrenNullPath() {
         // T4 - path nullo
 
         assertThrows(
@@ -243,7 +243,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenWithEmptyPathShouldNotCorruptTree() {
+    public void getChildrenEmptyPath() {
         // T5 - path vuoto
 
         assertDoesNotThrow(this::executeEmptyPathAndReuseTree);
@@ -261,7 +261,7 @@ public class DataTreeGetChildrenTest {
 
     @ParameterizedTest(name = "{index}: malformed path = {0}")
     @MethodSource("malformedPathParameters")
-    public void getChildrenWithMalformedPathShouldThrowNoNodeException(String malformedPath) {
+    public void getChildrenMalformedPath(String malformedPath) {
         assertThrows(
                 KeeperException.NoNodeException.class,
                 () -> dataTree.getChildren(
@@ -273,7 +273,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenWithPreValuedStatShouldUpdateStat() throws Exception {
+    public void getChildrenPreValuedStat() throws Exception {
         // T9 - path valido semplice, nodo con un solo figlio, stat già valorizzato
 
         createValidNode("/a");
@@ -291,7 +291,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenWithWatcherShouldNotGenerateImmediateEvent() throws Exception {
+    public void getChildrenWatcherNoEvent() throws Exception {
         // T10 - path valido semplice, nodo senza figli, watcher valido
 
         createValidNode("/a");
@@ -308,7 +308,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenShouldThrowNoNodeExceptionWhenNodeDoesNotExist() {
+    public void getChildrenMissingNodeThrows() {
         // T13 - path valido semplice, nodo assente
 
         assertThrows(
@@ -322,7 +322,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenOnRootWithNullStatShouldReturnNonNullList() throws Exception {
+    public void getChildrenRootNullStat() throws Exception {
         // T15 - path radice, stat null
 
         List<String> actualChildren = dataTree.getChildren(
@@ -335,7 +335,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenOnRootWithPreValuedStatShouldUpdateStat() throws Exception {
+    public void getChildrenRootPreValuedStat() throws Exception {
         // T16 - path radice, stat già valorizzato
 
         Stat stat = buildPreValuedStat();
@@ -350,7 +350,7 @@ public class DataTreeGetChildrenTest {
     }
 
     @Test
-    public void getChildrenOnMultilevelPathWithWatcherShouldNotGenerateImmediateEvent() throws Exception {
+    public void getChildrenMultilevelWatcherNoEvent() throws Exception {
         // T18 - path valido multilivello, watcher valido
 
         createValidNode("/a");

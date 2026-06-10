@@ -65,7 +65,7 @@ public class DataTreeDeleteNodeAfterJacocoTest {
     }
 
     @Test
-    public void deleteOneChildWhenParentHasMultipleChildren() throws Exception {
+    public void deleteOneChildMultipleParent() throws Exception {
         // T19 - parent con più figli: viene cancellato solo il figlio target
 
         createValidNode("/parent");
@@ -81,7 +81,7 @@ public class DataTreeDeleteNodeAfterJacocoTest {
     }
 
     @Test
-    public void deleteTwoLeavesThenDeleteParent() throws Exception {
+    public void deleteTwoLeavesThenParent() throws Exception {
         // T20 - cancellazione progressiva dei figli e poi del parent
 
         createValidNode("/a");
@@ -99,7 +99,7 @@ public class DataTreeDeleteNodeAfterJacocoTest {
     }
 
     @Test
-    public void deleteMissingDeepNodeWithExistingParent() throws Exception {
+    public void deleteMissingDeepNode() throws Exception {
         // T21 - nodo multilivello assente con parent presente
 
         createValidNode("/a");
@@ -115,7 +115,7 @@ public class DataTreeDeleteNodeAfterJacocoTest {
     }
 
     @Test
-    public void deleteExistingLeafWithLargeZxid() throws Exception {
+    public void deleteLeafLargeZxid() throws Exception {
         // T22 - cancellazione con zxid positivo elevato
 
         createValidNode("/a");
@@ -127,7 +127,7 @@ public class DataTreeDeleteNodeAfterJacocoTest {
     }
 
     @Test
-    public void deleteChildAfterDeletingSibling() throws Exception {
+    public void deleteChildAfterSibling() throws Exception {
         // T23 - cancellazione sequenziale di due figli dello stesso parent
 
         createValidNode("/parent");
@@ -144,7 +144,7 @@ public class DataTreeDeleteNodeAfterJacocoTest {
     }
 
     @Test
-    public void deletePathWithTrailingSlashShouldNotCorruptTree() throws Exception {
+    public void deleteTrailingSlashPath() throws Exception {
         // T24 - path con slash finale
 
         createValidNode("/a");
@@ -159,7 +159,7 @@ public class DataTreeDeleteNodeAfterJacocoTest {
     }
 
     @Test
-    public void deleteDeepMissingNodeShouldNotCorruptExistingBranch() throws Exception {
+    public void deleteDeepMissingNode() throws Exception {
         // T25 - path profondo assente in ramo parzialmente esistente
 
         createValidNode("/a");

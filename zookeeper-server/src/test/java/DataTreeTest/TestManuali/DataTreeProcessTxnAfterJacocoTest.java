@@ -123,7 +123,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
     // T24 - creazione nodo effimero
     //Test aggiunti in seguito all'analisi con jacoco
     @Test
-    public void processTxnShouldCreateEphemeralNode() throws Exception {
+    public void processTxnCreateEphemeral() throws Exception {
         TxnHeader createHeader = header(CLIENT_ID, OpCode.create, 30L);
 
         ProcessTxnResult result = dataTree.processTxn(
@@ -144,7 +144,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
 
     // T25 - chiusura sessione con nodo effimero presente
     @Test
-    public void processTxnCloseSessionShouldDeleteEphemeralNodesAndKeepPersistentNodes() throws Exception {
+    public void processTxnCloseSessionDeletesEphemerals() throws Exception {
         createValidNode("/persistent");
 
         dataTree.processTxn(
@@ -175,7 +175,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
 
     // T26 - chiusura sessione senza nodi effimeri
     @Test
-    public void processTxnCloseSessionWithoutEphemeralNodesShouldKeepTreeUnchanged() throws Exception {
+    public void processTxnCloseSessionNoEphemerals() throws Exception {
         createValidNode("/a");
         createValidNode("/b");
 
@@ -199,7 +199,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
 
     // T27 - chiusura sessione con nodi effimeri appartenenti a sessioni diverse
     @Test
-    public void processTxnCloseSessionShouldDeleteOnlyEphemeralNodesOwnedByThatSession() throws Exception {
+    public void processTxnCloseSessionOwnedOnly() throws Exception {
         dataTree.processTxn(
                 header(CLIENT_ID, OpCode.create, 40L),
                 createEphemeralTxn("/client-node"),
@@ -232,7 +232,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
 
     // T28 - creazione di figlio sotto nodo effimero
     @Test
-    public void processTxnShouldExposeLowLevelCreateChildUnderEphemeralNodeBehaviour() throws Exception {
+    public void processTxnCreateUnderEphemeral() throws Exception {
         dataTree.processTxn(
                 header(CLIENT_ID, OpCode.create, 50L),
                 createEphemeralTxn("/ephemeral-parent"),
@@ -262,7 +262,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
 
     // T29 - cancellazione di nodo con figli
     @Test
-    public void processTxnDeleteNodeWithChildrenShouldExposeLowLevelBehaviour() throws Exception {
+    public void processTxnDeleteWithChildren() throws Exception {
         createValidNode("/a");
         createValidNode("/a/b");
 
@@ -288,7 +288,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
 
     // T30 - multi valida con operazioni eterogenee
     @Test
-    public void processTxnShouldHandleHeterogeneousValidMultiTxn() throws Exception {
+    public void processTxnHeterogeneousMulti() throws Exception {
         createValidNode("/a");
         createValidNode("/toDelete");
 
@@ -323,7 +323,7 @@ public class DataTreeProcessTxnAfterJacocoTest {
 
     // T31 - multi con errore intermedio
     @Test
-    public void processTxnShouldHandleMultiTxnWithIntermediateError() throws Exception {
+    public void processTxnMultiIntermediateError() throws Exception {
         createValidNode("/a");
 
         MultiTxn multiTxn = new MultiTxn(Arrays.asList(

@@ -66,7 +66,7 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldReturnDataForExistingSimplePath() throws Exception {
+    public void getDataExistingSimplePath() throws Exception {
         // T1 - path valido semplice, nodo richiesto già presente,
         // stat valido, watcher null
 
@@ -81,7 +81,7 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldReturnDataForExistingMultilevelPath() throws Exception {
+    public void getDataExistingMultilevelPath() throws Exception {
         // T2 - path valido multilivello, nodo richiesto presente
         // in un path multilivello, stat valido, watcher null
 
@@ -98,7 +98,7 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldPopulateValidStatObject() throws Exception {
+    public void getDataPopulatesStat() throws Exception {
         // T3 - stat = new Stat().
         // Il metodo deve restituire i dati e valorizzare lo Stat
         // con i metadati effettivi del nodo letto.
@@ -116,7 +116,7 @@ public class DataTreeGetDataTest {
 
     @Test
    @Disabled
-    public void getDataShouldReturnDataWhenStatIsNull() throws Exception {
+    public void getDataWithNullStat() throws Exception {
         // T4 - stat = null.
         // Caso limite in cui il chiamante richiede i dati senza passare
         // un oggetto Stat da valorizzare.
@@ -130,7 +130,7 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldOverwritePreviouslyValuedStat() throws Exception {
+    public void getDataOverwritesStat() throws Exception {
         // T5 - stat già valorizzato prima della chiamata.
         // Il metodo deve sovrascrivere i valori precedenti dello Stat
         // con i metadati reali del nodo.
@@ -151,7 +151,7 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldAcceptAndRegisterValidWatcherMock() throws Exception {
+    public void getDataRegistersWatcher() throws Exception {
         // T6 - watcher valido non nullo.
         // Il watcher viene passato come mock dell'interfaccia Watcher.
         // getData(...) deve registrarlo sul nodo, ma non deve invocare
@@ -182,32 +182,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataWithNullWatcherShouldNotRegisterWatcher() throws Exception {
-        // T7 - watcher = null.
-        // Il metodo deve restituire i dati del nodo senza registrare
-        // alcuna watch.
-
-        createValidNode("/a", VALID_DATA);
-
-        byte[] result = dataTree.getData("/a", new Stat(), null);
-
-        assertArrayEquals(VALID_DATA, result);
-
-        assertDoesNotThrow(() -> dataTree.setData(
-                "/a",
-                NEW_DATA,
-                -1,
-                2L,
-                System.currentTimeMillis()
-        ));
-
-        byte[] updatedData = dataTree.getData("/a", new Stat(), null);
-        assertArrayEquals(NEW_DATA, updatedData);
-    }
-
-    @Test
-    public void getDataShouldThrowNoNodeExceptionForMissingSimplePath() {
-        // T8 - path valido semplice, nodo richiesto assente,
+    public void getDataMissingSimplePathThrows() {
+        // T7 - path valido semplice, nodo richiesto assente,
         // stat valido, watcher null.
         // Il metodo deve sollevare NoNodeException.
 
@@ -221,8 +197,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldThrowNoNodeExceptionForMissingMultilevelPath() {
-        // T9 - path valido multilivello, nodo richiesto assente,
+    public void getDataMissingMultilevelPathThrows() {
+        // T8 - path valido multilivello, nodo richiesto assente,
         // stat valido, watcher null.
         // Il metodo deve sollevare NoNodeException.
 
@@ -237,8 +213,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldThrowNoNodeExceptionForMissingMultilevelPathWithValidWatcher() {
-        // T10 - path sintatticamente valido, nodo richiesto assente,
+    public void getDataMissingPathWithWatcherThrows() {
+        // T9 - path sintatticamente valido, nodo richiesto assente,
         // stat valido, watcher valido non nullo.
         // Anche se il watcher è valido, l'assenza del nodo deve avere priorità
         // e il metodo deve sollevare NoNodeException.
@@ -259,8 +235,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataOnIndependentBranchShouldNotAlterOtherBranches() throws Exception {
-        // T11 - path valido multilivello, DataTree con più nodi
+    public void getDataIndependentBranch() throws Exception {
+        // T10 - path valido multilivello, DataTree con più nodi
         // e rami indipendenti.
         // La lettura di "/x/y" non deve alterare il ramo indipendente "/a".
 
@@ -281,8 +257,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataOnRootInInitialTreeShouldBeHandledCorrectly() {
-        // T12 - path radice, DataTree nello stato iniziale.
+    public void getDataRootInitialTree() {
+        // T11 - path radice, DataTree nello stato iniziale.
         // Il metodo deve gestire correttamente la lettura della root.
 
         assertDoesNotThrow(() -> {
@@ -294,8 +270,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataOnRootShouldNotAlterExistingApplicationNodes() throws Exception {
-        // T13 - path radice, DataTree con più nodi e rami indipendenti.
+    public void getDataRootKeepsNodes() throws Exception {
+        // T12 - path radice, DataTree con più nodi e rami indipendenti.
         // La lettura della root non deve alterare i nodi applicativi presenti.
 
         createValidNode("/a", VALID_DATA);
@@ -318,8 +294,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataWithNullPathShouldNotCorruptTree() {
-        // T14 - path nullo.
+    public void getDataNullPath() {
+        // T13 - path nullo.
         // Il metodo deve sollevare un'eccezione oppure comunque
         // non corrompere lo stato del DataTree.
 
@@ -333,8 +309,8 @@ public class DataTreeGetDataTest {
 
     @Test
     @Disabled
-    public void getDataWithEmptyPathShouldNotCorruptTree() {
-        // T15 - path vuoto o malformato: "".
+    public void getDataEmptyPath() {
+        // T14 - path vuoto o malformato: "".
         // Il metodo deve sollevare un'eccezione oppure comunque
         // non corrompere lo stato del DataTree.
 
@@ -347,8 +323,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataWithPathWithoutInitialSlashShouldNotCorruptTree() {
-        // T16 - path vuoto o malformato: "a/b".
+    public void getDataPathWithoutSlash() {
+        // T15 - path vuoto o malformato: "a/b".
         // Il path non rispetta la forma canonica dei path ZooKeeper,
         // poiché non inizia con "/".
 
@@ -361,8 +337,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataWithDoubleSlashPathShouldNotCorruptTree() {
-        // T17 - path vuoto o malformato: "/a//b".
+    public void getDataDoubleSlashPath() {
+        // T16 - path vuoto o malformato: "/a//b".
         // Il path contiene una doppia slash interna e viene trattato
         // come caso malformato o non valido per il dominio del test.
 
@@ -375,8 +351,8 @@ public class DataTreeGetDataTest {
     }
 
     @Test
-    public void getDataShouldThrowNoNodeExceptionWhenOnlyRootExists() {
-        // T18 - path valido semplice, DataTree con solo nodo radice presente.
+    public void getDataOnlyRootExists() {
+        // T17 - path valido semplice, DataTree con solo nodo radice presente.
         // Il nodo applicativo "/a" non è presente, quindi il metodo deve
         // sollevare NoNodeException senza alterare la root.
 
@@ -394,7 +370,7 @@ public class DataTreeGetDataTest {
 
     @Test
 
-    public void getDataWithEmptyPathShouldNotCorruptTreeExtension() {
+    public void getDataEmptyPathExtension() {
         try {
             dataTree.getData("", new Stat(), null);
         } catch (Exception ignored) {

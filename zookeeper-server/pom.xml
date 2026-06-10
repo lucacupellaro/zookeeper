@@ -573,4 +573,116 @@
      </plugins>
   </build>
 
+  <profiles>
+    <!-- Profilo: solo test manuali -->
+    <profile>
+      <id>tests-manual</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/TestManuali/**/*Test.java</include>
+              </includes>
+              <excludes>
+                <exclude>**/*ErrorTest*.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Profilo: solo test LLM -->
+    <profile>
+      <id>tests-llm</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/TestLLM/**/*Test.java</include>
+              </includes>
+              <excludes>
+                <exclude>**/*ErrorTest*.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Profilo: solo test Randoop -->
+    <profile>
+      <id>tests-randoop</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/randoop/**/*Test.java</include>
+              </includes>
+              <excludes>
+                <exclude>**/*ErrorTest*.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Profilo: solo test EvoSuite -->
+    <profile>
+      <id>tests-evosuite</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/*_ESTest.java</include>
+              </includes>
+              <excludes>
+                <exclude>**/*_ESTest_scaffolding.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Profilo aggregatore: tutti i test (attivo di default) -->
+    <profile>
+      <id>tests-all</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/*Test.java</include>
+                <include>**/*_ESTest.java</include>
+              </includes>
+              <excludes>
+                <exclude>**/*ErrorTest*.java</exclude>
+                <exclude>**/*_ESTest_scaffolding.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class IntegrationTest {
 
     @Test
-    public void processTxnShouldApplyDeserializedCreateTransaction() throws Exception {
+    public void processTxnDeserializedCreate() throws Exception {
 
         DataTree dataTree = new DataTree();
 

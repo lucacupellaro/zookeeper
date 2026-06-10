@@ -77,6 +77,7 @@ public class PathTrieAddPathTest {
     public void T7_pathNullo_statoNonCorrotto() {
         PathTrie trie = new PathTrie();
 
+
         executeAllowingRuntimeException(() -> trie.addPath(null));
 
         assertTrieStillUsable(trie);

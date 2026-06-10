@@ -386,7 +386,7 @@ public class DataTreeProcessTxnTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("processTxnParameters")
-    public void processTxnShouldReturnExpectedResultAndState(
+    public void processTxnExpectedResult(
             String testName,
             List<String> initialPaths,
             TxnHeader header,
@@ -444,7 +444,7 @@ public class DataTreeProcessTxnTest {
 
     // T14 - multi con sotto-operazione di errore
     @Test
-    public void processTxnShouldHandleMultiTxnWithError() throws Exception {
+    public void processTxnMultiWithError() throws Exception {
         MultiTxn multiTxn = new MultiTxn(Arrays.asList(
                 subTxn(OpCode.create, createTxn("/a")),
                 subTxn(OpCode.error, new ErrorTxn(Code.NONODE.intValue()))
@@ -464,7 +464,7 @@ public class DataTreeProcessTxnTest {
 
     // T16 - header nullo
     @Test
-    public void processTxnWithNullHeaderShouldThrowAndNotCorruptTree() throws Exception {
+    public void processTxnNullHeader() throws Exception {
         assertThrows(
                 NullPointerException.class,
                 () -> dataTree.processTxn(null, createTxn("/a"), false)
@@ -475,7 +475,7 @@ public class DataTreeProcessTxnTest {
 
     // T17 - record nullo
     @Test
-    public void processTxnWithNullRecordShouldThrowAndNotCorruptTree() throws Exception {
+    public void processTxnNullRecord() throws Exception {
         assertThrows(
                 RuntimeException.class,
                 () -> dataTree.processTxn(header(OpCode.create), null, false)
@@ -486,7 +486,7 @@ public class DataTreeProcessTxnTest {
 
     // T18 - header e record non coerenti
     @Test
-    public void processTxnWithInconsistentHeaderAndTxnShouldThrowAndNotCorruptTree() throws Exception {
+    public void processTxnInconsistentHeader() throws Exception {
         assertThrows(
                 RuntimeException.class,
                 () -> dataTree.processTxn(
@@ -502,7 +502,7 @@ public class DataTreeProcessTxnTest {
     // T20 - zxid anomalo
     @ParameterizedTest(name = "T20 - zxid anomalo = {0}")
     @ValueSource(longs = {0L, -1L})
-    public void processTxnShouldHandleAnomalousZxid(long anomalousZxid) throws Exception {
+    public void processTxnAnomalousZxid(long anomalousZxid) throws Exception {
         ProcessTxnResult result = dataTree.processTxn(
                 header(OpCode.create, anomalousZxid),
                 createTxn("/a"),
@@ -519,7 +519,7 @@ public class DataTreeProcessTxnTest {
 
     // T21 - record con path nullo
     @Test
-    public void processTxnWithNullPathInRecordShouldThrowAndNotCorruptTree() throws Exception {
+    public void processTxnNullPathInRecord() throws Exception {
         assertThrows(
                 RuntimeException.class,
                 () -> dataTree.processTxn(
@@ -535,7 +535,7 @@ public class DataTreeProcessTxnTest {
     // T22 - record con path vuoto o malformato
     @ParameterizedTest(name = "T22 - path malformato = {0}")
     @ValueSource(strings = {"", "a/b", "/a//b"})
-    public void processTxnWithMalformedPathShouldReturnErrorOrThrowAndNotCorruptTree(String malformedPath)
+    public void processTxnMalformedPath(String malformedPath)
             throws Exception {
 
         try {
@@ -555,236 +555,5 @@ public class DataTreeProcessTxnTest {
         assertTreeStillUsable();
     }
 
-    // T24 - creazione nodo effimero
-    //Test aggiunti in seguito all'analisi con jacoco
-    @Test
-    public void processTxnShouldCreateEphemeralNode() throws Exception {
-        TxnHeader createHeader = header(CLIENT_ID, OpCode.create, 30L);
 
-        ProcessTxnResult result = dataTree.processTxn(
-                createHeader,
-                createEphemeralTxn("/ephemeral"),
-                false
-        );
-
-        assertEquals(Code.OK.intValue(), result.err);
-        assertNodeExists("/ephemeral");
-        assertDataEquals("/ephemeral", INITIAL_DATA);
-
-        Stat stat = getNodeStat("/ephemeral");
-        assertEquals(CLIENT_ID, stat.getEphemeralOwner());
-
-        assertEquals(createHeader.getZxid(), dataTree.lastProcessedZxid);
-    }
-
-    // T25 - chiusura sessione con nodo effimero presente
-    @Test
-    public void processTxnCloseSessionShouldDeleteEphemeralNodesAndKeepPersistentNodes() throws Exception {
-        createValidNode("/persistent");
-
-        dataTree.processTxn(
-                header(CLIENT_ID, OpCode.create, 31L),
-                createEphemeralTxn("/ephemeral"),
-                false
-        );
-
-        assertNodeExists("/persistent");
-        assertNodeExists("/ephemeral");
-
-        TxnHeader closeHeader = header(CLIENT_ID, OpCode.closeSession, 32L);
-
-        ProcessTxnResult result = dataTree.processTxn(
-                closeHeader,
-                null,
-                false
-        );
-
-        assertEquals(Code.OK.intValue(), result.err);
-
-        assertNodeDoesNotExist("/ephemeral");
-        assertNodeExists("/persistent");
-        assertDataEquals("/persistent", INITIAL_DATA);
-
-        assertEquals(closeHeader.getZxid(), dataTree.lastProcessedZxid);
-    }
-
-    // T26 - chiusura sessione senza nodi effimeri
-    @Test
-    public void processTxnCloseSessionWithoutEphemeralNodesShouldKeepTreeUnchanged() throws Exception {
-        createValidNode("/a");
-        createValidNode("/b");
-
-        TxnHeader closeHeader = header(CLIENT_ID, OpCode.closeSession, 33L);
-
-        ProcessTxnResult result = dataTree.processTxn(
-                closeHeader,
-                null,
-                false
-        );
-
-        assertEquals(Code.OK.intValue(), result.err);
-
-        assertNodeExists("/a");
-        assertNodeExists("/b");
-        assertDataEquals("/a", INITIAL_DATA);
-        assertDataEquals("/b", INITIAL_DATA);
-
-        assertEquals(closeHeader.getZxid(), dataTree.lastProcessedZxid);
-    }
-
-    // T27 - chiusura sessione con nodi effimeri appartenenti a sessioni diverse
-    @Test
-    public void processTxnCloseSessionShouldDeleteOnlyEphemeralNodesOwnedByThatSession() throws Exception {
-        dataTree.processTxn(
-                header(CLIENT_ID, OpCode.create, 40L),
-                createEphemeralTxn("/client-node"),
-                false
-        );
-
-        dataTree.processTxn(
-                header(OTHER_CLIENT_ID, OpCode.create, 41L),
-                createEphemeralTxn("/other-client-node"),
-                false
-        );
-
-        assertNodeExists("/client-node");
-        assertNodeExists("/other-client-node");
-
-        ProcessTxnResult result = dataTree.processTxn(
-                header(CLIENT_ID, OpCode.closeSession, 42L),
-                null,
-                false
-        );
-
-        assertEquals(Code.OK.intValue(), result.err);
-
-        assertNodeDoesNotExist("/client-node");
-        assertNodeExists("/other-client-node");
-
-        Stat otherStat = getNodeStat("/other-client-node");
-        assertEquals(OTHER_CLIENT_ID, otherStat.getEphemeralOwner());
-    }
-
-    // T28 - creazione di figlio sotto nodo effimero
-    @Test
-    public void processTxnShouldExposeLowLevelCreateChildUnderEphemeralNodeBehaviour() throws Exception {
-        dataTree.processTxn(
-                header(CLIENT_ID, OpCode.create, 50L),
-                createEphemeralTxn("/ephemeral-parent"),
-                false
-        );
-
-        assertNodeExists("/ephemeral-parent");
-
-        ProcessTxnResult result = dataTree.processTxn(
-                header(OpCode.create, 51L),
-                createTxn("/ephemeral-parent/child"),
-                false
-        );
-
-        /*
-         * Nota: processTxn applica transazioni già preparate/validate.
-         * Il controllo funzionale "un nodo effimero non può avere figli"
-         * può essere demandato ai livelli superiori.
-         */
-        assertEquals(Code.OK.intValue(), result.err);
-        assertNodeExists("/ephemeral-parent");
-        assertNodeExists("/ephemeral-parent/child");
-        assertDataEquals("/ephemeral-parent/child", INITIAL_DATA);
-
-        assertEquals(51L, dataTree.lastProcessedZxid);
-    }
-
-    // T29 - cancellazione di nodo con figli
-    @Test
-    public void processTxnDeleteNodeWithChildrenShouldExposeLowLevelBehaviour() throws Exception {
-        createValidNode("/a");
-        createValidNode("/a/b");
-
-        ProcessTxnResult result = dataTree.processTxn(
-                header(OpCode.delete, 60L),
-                deleteTxn("/a"),
-                false
-        );
-
-        /*
-         * Nota: processTxn lavora a livello di applicazione della transazione.
-         * Il controllo NOTEMPTY può essere già stato gestito prima della scrittura
-         * della transazione nel log.
-         */
-        assertEquals(Code.OK.intValue(), result.err);
-
-        assertNodeDoesNotExist("/a");
-        assertNodeExists("/a/b");
-        assertDataEquals("/a/b", INITIAL_DATA);
-
-        assertEquals(60L, dataTree.lastProcessedZxid);
-    }
-
-    // T30 - multi valida con operazioni eterogenee
-    @Test
-    public void processTxnShouldHandleHeterogeneousValidMultiTxn() throws Exception {
-        createValidNode("/a");
-        createValidNode("/toDelete");
-
-        MultiTxn multiTxn = new MultiTxn(Arrays.asList(
-                subTxn(OpCode.create, createTxn("/created")),
-                subTxn(OpCode.setData, new SetDataTxn("/a", NEW_DATA, 1)),
-                subTxn(OpCode.delete, deleteTxn("/toDelete"))
-        ));
-
-        TxnHeader multiHeader = header(OpCode.multi, 70L);
-
-        ProcessTxnResult result = dataTree.processTxn(
-                multiHeader,
-                multiTxn,
-                false
-        );
-
-        assertEquals(Code.OK.intValue(), result.err);
-        assertNotNull(result.multiResult);
-        assertEquals(3, result.multiResult.size());
-
-        assertNodeExists("/created");
-        assertDataEquals("/created", INITIAL_DATA);
-
-        assertNodeExists("/a");
-        assertDataEquals("/a", NEW_DATA);
-
-        assertNodeDoesNotExist("/toDelete");
-
-        assertEquals(multiHeader.getZxid(), dataTree.lastProcessedZxid);
-    }
-
-    // T31 - multi con errore intermedio
-    @Test
-    public void processTxnShouldHandleMultiTxnWithIntermediateError() throws Exception {
-        createValidNode("/a");
-
-        MultiTxn multiTxn = new MultiTxn(Arrays.asList(
-                subTxn(OpCode.setData, new SetDataTxn("/a", NEW_DATA, 1)),
-                subTxn(OpCode.delete, deleteTxn("/missing"))
-        ));
-
-        ProcessTxnResult result = dataTree.processTxn(
-                header(OpCode.multi, 80L),
-                multiTxn,
-                false
-        );
-
-        assertNotNull(result);
-        assertNotNull(result.multiResult);
-        assertEquals(2, result.multiResult.size());
-
-        assertTrue(
-                result.multiResult.stream()
-                        .anyMatch(subResult -> subResult.err == Code.NONODE.intValue()),
-                "La multi dovrebbe contenere almeno una sotto-operazione con errore NONODE"
-        );
-
-        assertNodeExists("/a");
-        assertDataEquals("/a", NEW_DATA);
-
-        assertTreeStillUsable();
-    }
 }

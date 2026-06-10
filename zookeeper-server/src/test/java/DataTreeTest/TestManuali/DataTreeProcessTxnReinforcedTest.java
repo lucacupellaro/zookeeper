@@ -108,7 +108,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T1
     @Test
-    public void processTxnCreateShouldCreateNodeAndReturnConsistentResult() throws Exception {
+    public void processTxnCreateNode() throws Exception {
         long zxid = 10L;
         CreateTxn txn = new CreateTxn("/a", NEW_DATA, VALID_ACL, false, -1);
 
@@ -135,7 +135,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T2
     @Test
-    public void processTxnCreateMultilevelShouldCreateChildUnderExistingParent() throws Exception {
+    public void processTxnCreateMultilevel() throws Exception {
         createNode("/a");
 
         long zxid = 20L;
@@ -160,7 +160,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T3
     @Test
-    public void processTxnCreateExistingNodeShouldNotOverwriteState() throws Exception {
+    public void processTxnCreateExistingNode() throws Exception {
         createNode("/a");
 
         byte[] oldData = dataTree.getData("/a", new Stat(), null);
@@ -192,7 +192,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T4
     @Test
-    public void processTxnCreateWithoutParentShouldReturnNoNodeAndNotCreateNode() {
+    public void processTxnCreateNoParent() {
         int oldNodeCount = dataTree.getNodeCount();
 
         CreateTxn txn = new CreateTxn("/a/b", NEW_DATA, VALID_ACL, false, -1);
@@ -214,7 +214,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T5
     @Test
-    public void processTxnDeleteShouldRemoveNodeAndReturnConsistentResult() throws Exception {
+    public void processTxnDeleteNode() throws Exception {
         createNode("/a");
 
         long zxid = 30L;
@@ -238,7 +238,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T6
     @Test
-    public void processTxnDeleteAbsentNodeShouldReturnNoNodeAndKeepState() throws Exception {
+    public void processTxnDeleteAbsentNode() throws Exception {
         createNode("/a");
 
         int oldNodeCount = dataTree.getNodeCount();
@@ -264,7 +264,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T7
     @Test
-    public void processTxnSetDataShouldUpdateDataAndMetadata() throws Exception {
+    public void processTxnSetData() throws Exception {
         createNode("/a");
 
         long zxid = 40L;
@@ -291,7 +291,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T8
     @Test
-    public void processTxnSetDataOnAbsentNodeShouldReturnNoNodeAndKeepState() throws Exception {
+    public void processTxnSetDataAbsentNode() throws Exception {
         createNode("/a");
 
         int oldNodeCount = dataTree.getNodeCount();
@@ -316,7 +316,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T9
     @Test
-    public void processTxnSetAclShouldUpdateAclAndAversion() throws Exception {
+    public void processTxnSetAcl() throws Exception {
         createNode("/a");
 
         int version = 7;
@@ -339,7 +339,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T10
     @Test
-    public void processTxnSetAclOnAbsentNodeShouldReturnNoNodeAndKeepState() throws Exception {
+    public void processTxnSetAclAbsentNode() throws Exception {
         createNode("/a");
 
         List<ACL> oldAcl = dataTree.getACL("/a", new Stat());
@@ -364,7 +364,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T11
     @Test
-    public void processTxnCheckShouldNotModifyNodeState() throws Exception {
+    public void processTxnCheck() throws Exception {
         createNode("/a");
 
         int oldNodeCount = dataTree.getNodeCount();
@@ -394,7 +394,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T12
     @Test
-    public void processTxnErrorShouldReturnErrorCodeAndNotModifyTree() throws Exception {
+    public void processTxnError() throws Exception {
         createNode("/a");
 
         int oldNodeCount = dataTree.getNodeCount();
@@ -417,7 +417,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T13
     @Test
-    public void processTxnValidMultiShouldApplyAllSubTransactions() throws Exception {
+    public void processTxnValidMulti() throws Exception {
         createNode("/a");
 
         Txn createChild = new Txn(
@@ -450,7 +450,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T14
     @Test
-    public void processTxnMultiWithErrorShouldReturnErrorAndKeepTreeConsistent() throws Exception {
+    public void processTxnMultiWithError() throws Exception {
         Txn createNode = new Txn(
                 OpCode.create,
                 serializeRecord(new CreateTxn("/a", NEW_DATA, VALID_ACL, false, -1))
@@ -480,7 +480,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T15
     @Test
-    public void processTxnSubTxnShouldApplyOperationWithoutUpdatingLastProcessedZxid() {
+    public void processTxnSubTxn() {
         long oldLastProcessedZxid = dataTree.lastProcessedZxid;
 
         CreateTxn txn = new CreateTxn("/a", NEW_DATA, VALID_ACL, false, -1);
@@ -501,7 +501,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T20
     @Test
-    public void processTxnCreateWithBorderlineZxidShouldStoreZxidConsistently() throws Exception {
+    public void processTxnCreateBorderlineZxid() throws Exception {
         long zxid = -1L;
 
         CreateTxn txn = new CreateTxn("/a", NEW_DATA, VALID_ACL, false, -1);
@@ -526,7 +526,7 @@ public class DataTreeProcessTxnReinforcedTest {
 
     // T23
     @Test
-    public void processTxnSetDataOnIndependentBranchShouldModifyOnlyTargetBranch() throws Exception {
+    public void processTxnSetDataIndependentBranch() throws Exception {
         createNode("/a");
         createNode("/x");
         createNode("/x/y");
